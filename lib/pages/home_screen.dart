@@ -1,12 +1,11 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:ghazaoman/components/appbar.dart';
+import 'package:ghazaoman/components/baner_home_screen.dart';
 import 'package:ghazaoman/components/drawer.dart';
+import 'package:ghazaoman/components/drawer_icon.dart';
+import 'package:ghazaoman/model/menue.dart';
+import 'package:ghazaoman/pages/detail.dart';
 import 'package:ghazaoman/style/app_colors.dart';
-import 'package:http/http.dart' as http;
-import 'package:http/http.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -16,164 +15,138 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<dynamic> foodsData = [];
+  GlobalKey<AnimatedListState> _listKey = GlobalKey<AnimatedListState>();
+  List<Widget> _menuelist = [];
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _addMenueList();
+    });
   }
 
-  Future<void> fetchData() async {
-    if (!mounted) {
-      return;
-    }
-    try {
-      final response = await http.get(
-        Uri.parse(
-            'https://raw.githubusercontent.com/hamzehazizzadeh/rezim_scraping/main/all.json'),
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-      );
+  void _addMenueList() {
+    List<Menue> _menus = [
+      Menue(
+          image: "assets/images/menue/sonati.jpg",
+          title: "غذاهای اصلی",
+          detail: ["assets/images/menue/1.jpg"]),
+      Menue(
+          image: "assets/images/menue/fasttfood.jpg",
+          title: "فست فود",
+          detail: ["assets/images/menue/2.jpg"]),
+      Menue(
+          image: "assets/images/menue/pishGhaza.jpg",
+          title: "پیش غذا",
+          detail: ["assets/images/menue/3.jpg"]),
+      Menue(
+          image: "assets/images/menue/deser.jpg",
+          title: "شیرینی و دسر",
+          detail: ["assets/images/menue/4.jpg"]),
+      Menue(
+          image: "assets/images/menue/sobhane.jpg",
+          title: "صبحانه",
+          detail: ["assets/images/menue/5.png"]),
+      Menue(
+          image: "assets/images/menue/other.jpg",
+          title: "سایر",
+          detail: ["assets/images/menue/6.jpg"])
+    ];
 
-      if (mounted && response.statusCode == 200) {
-        List<dynamic> jsonData = jsonDecode(response.body);
-        setState(() {
-          foodsData = jsonData;
+    Future ft = Future(() {});
+    _menus.forEach((Menue menue) {
+      ft = ft.then((_) {
+        return Future.delayed(const Duration(milliseconds: 100), () {
+          _menuelist.add(_buildTile(menue));
+          _listKey.currentState!.insertItem(_menuelist.length - 1);
         });
-      } else {}
-    } on Exception {
-      log("Error Fetch Data");
-    }
+      });
+    });
   }
 
+  Widget _buildTile(Menue menue) {
+    return ListTile(
+      onTap: () {
+        Navigator.push(context,
+            MaterialPageRoute(builder: (context) => Details(menue: menue)));
+      },
+      contentPadding: const EdgeInsets.all(2),
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            width: double.infinity,
+            height: 125,
+            decoration: const BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.all(
+                Radius.circular(8),
+              ),
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                children: [
+                  Hero(
+                    tag: menue.image,
+                    child: CircleAvatar(
+                      radius: 55,
+                      backgroundImage: AssetImage(menue.image),
+                    ),
+                  ),
+                  const SizedBox(
+                    width: 45,
+                  ),
+                  Center(
+                      child: Text(
+                    menue.title,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  )),
+                ],
+              ),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
+  Tween<Offset> _offset = Tween(begin: Offset(1, 0), end: Offset(0, 0));
   @override
   Widget build(BuildContext context) {
     return Directionality(
       textDirection: TextDirection.rtl,
       child: Scaffold(
-        appBar: MyAppbar(title: "غذا و من", leading: const Menue()),
-        drawer: MyDrawer(),
-        body: ListView.builder(
-          itemCount: foodsData.length,
-          itemBuilder: (context, index) {
-            return ListTile(
-              title: Text(foodsData[index]["foods"]["category"].toString()),
-              onTap: () {
-                // اطلاعات بیشتری را نمایش دهید یا به صفحه مخصوص به هر غذا منتقل شوید
-              },
-            );
-          },
+        appBar: MyAppbar(
+          title: "غذا و من",
+          leading: const DrawerIcon(),
+        ),
+        drawer: const MyDrawer(),
+        body: Column(
+          children: [
+            const SizedBox(
+              height: 10,
+            ),
+            const BanerHomeScreen(),
+            const SizedBox(
+              height: 25,
+            ),
+            Expanded(
+              child: AnimatedList(
+                key: _listKey,
+                initialItemCount: _menuelist.length,
+                itemBuilder: (context, index, animation) {
+                  return SlideTransition(
+                    position: animation.drive(_offset),
+                    child: _menuelist[index],
+                  );
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
-class Menue extends StatelessWidget {
-  const Menue({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return IconButton(
-        onPressed: () {
-          Scaffold.of(context).openDrawer();
-        },
-        icon: const Icon(
-          Icons.menu_rounded,
-          color: AppColors.white,
-        ));
-  }
-}
-
-
-
-
-
-
-
-
-// import 'dart:convert';
-// import 'package:flutter/material.dart';
-// import 'package:http/http.dart' as http;
-
-// void main() {
-//   runApp(MyApp());
-// }
-
-// class MyApp extends StatelessWidget {
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(
-//           title: Text('لیست غذاهای دسته‌بندی "پلوها و چلوها"'),
-//         ),
-//         body: FoodList(),
-//       ),
-//     );
-//   }
-// }
-
-// class FoodList extends StatefulWidget {
-//   @override
-//   _FoodListState createState() => _FoodListState();
-// }
-
-// class _FoodListState extends State<FoodList> {
-//   List<Map<String, dynamic>> categoryData = [];
-
-//   @override
-//   void initState() {
-//     super.initState();
-//     fetchDataFromJson();
-//   }
-
-//   void fetchDataFromJson() async {
-//     final url = Uri.parse(
-//         'https://raw.githubusercontent.com/hamzehazizzadeh/rezim_scraping/main/all.json');
-
-//     final response = await http.get(url);
-
-//     if (response.statusCode == 200) {
-//       final data = json.decode(response.body);
-//       final category = "پلوها و چلوها";
-
-//       for (var item in data) {
-//         if (item['subCategories'] != null) {
-//           for (var subCategory in item['subCategories']) {
-//             if (subCategory['foods'] != null) {
-//               for (var food in subCategory['foods']) {
-//                 if (food['category'] == category) {
-//                   categoryData.add({
-//                     'دسته‌بندی': food['category'],
-//                     'عنوان غذا': food['title'],
-//                     'تصویر': food['banner'],
-//                   });
-//                 }
-//               }
-//             }
-//           }
-//         }
-//       }
-
-//       // بروزرسانی ویجت با اطلاعات جدید
-//       setState(() {});
-//     }
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return ListView.builder(
-//       itemCount: categoryData.length,
-//       itemBuilder: (context, index) {
-//         return ListTile(
-//           title: Text(categoryData[index]['عنوان غذا']),
-//           subtitle: Text(categoryData[index]['دسته‌بندی']),
-//           leading: Image.network(categoryData[index]['تصویر']),
-//         );
-//       },
-//     );
-//   }
-// }

@@ -26,7 +26,7 @@ class _MyDrawerState extends State<MyDrawer> {
             height: MediaQuery.of(context).size.height / 3,
             width: double.infinity,
             decoration: BoxDecoration(color: AppColors.appbar),
-            child: Image.asset("assets/images/salad_325559.png", scale: 3),
+            child: Image.asset("assets/images/icon/salad_325559.png", scale: 3),
           ),
           const SizedBox(
             height: 30,
