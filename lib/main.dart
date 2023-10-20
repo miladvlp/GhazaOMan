@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ghazaoman/config/app_rout.dart';
 import 'package:ghazaoman/model/provider.dart';
 import 'package:ghazaoman/pages/home_screen.dart';
 import 'package:ghazaoman/style/app_colors.dart';
@@ -33,7 +34,8 @@ class MyApp extends StatelessWidget {
           fontFamily: "Sans",
           useMaterial3: true,
           scaffoldBackgroundColor: AppColors.bg),
-      home: const HomeScreen(),
+      initialRoute: '/',
+      routes: AppRout.pages,
     );
   }
 }

@@ -59,13 +59,16 @@ flutter:
     - assets/images/menue/pishGhaza.jpg
     - assets/images/menue/sobhane.jpg
     - assets/images/menue/sonati.jpg
-    - assets/images/menue/1.jpg
-    - assets/images/menue/2.jpg
-    - assets/images/menue/3.jpg
-    - assets/images/menue/4.jpg
-    - assets/images/menue/5.png
-    - assets/images/menue/6.jpg
-  
+    - assets/images/Asli/daryai.jpg
+    - assets/images/Asli/dolme.jpg
+    - assets/images/Asli/kabab.jpg
+    - assets/images/Asli/khorak.jpg
+    - assets/images/Asli/khoresht.jpg
+    - assets/images/Asli/coco.jpg
+    - assets/images/Asli/polo.png
+    - assets/images/Asli/sayerGhazaAsli.jpg
+    - assets/images/Asli/abgosht.jpg
+
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
